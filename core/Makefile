@@ -1278,33 +1278,6 @@ else
 recovery_wipe :=
 endif
 
-# Traditionally with non-A/B OTA we have:
-#   boot.img + recovery-from-boot.p + recovery-resource.dat = recovery.img.
-# recovery-resource.dat is needed only if we carry an imgdiff patch of the boot and recovery images
-# and invoke install-recovery.sh on the first boot post an OTA update.
-#
-# We no longer need that if one of the following conditions holds:
-#   a) We carry a full copy of the recovery image - no patching needed
-#      (BOARD_USES_FULL_RECOVERY_IMAGE = true);
-#   b) We build a single image that contains boot and recovery both - no recovery image to install
-#      (BOARD_USES_RECOVERY_AS_BOOT = true);
-#   c) We build the root into system image - not needing the resource file as we do bsdiff
-#      (BOARD_BUILD_SYSTEM_ROOT_IMAGE = true).
-#   d) We include the recovery DTBO image within recovery - not needing the resource file as we
-#      do bsdiff because boot and recovery will contain different number of entries
-#      (BOARD_INCLUDE_RECOVERY_DTBO = true).
-# Note that condition b) implies condition c), because of the earlier check in this file:
-# "BOARD_USES_RECOVERY_AS_BOOT = true must have BOARD_BUILD_SYSTEM_ROOT_IMAGE = true" (not vice
-# versa though).
-
-ifeq (,$(filter true, $(BOARD_USES_FULL_RECOVERY_IMAGE) $(BOARD_BUILD_SYSTEM_ROOT_IMAGE) \
-  $(BOARD_INCLUDE_RECOVERY_DTBO)))
-# Named '.dat' so we don't attempt to use imgdiff for patching it.
-RECOVERY_RESOURCE_ZIP := $(TARGET_OUT)/etc/recovery-resource.dat
-else
-RECOVERY_RESOURCE_ZIP :=
-endif
-
 INTERNAL_RECOVERYIMAGE_ARGS := \
 	$(addprefix --second ,$(INSTALLED_2NDBOOTLOADER_TARGET)) \
 	--kernel $(recovery_kernel) \
