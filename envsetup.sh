@@ -155,6 +155,10 @@ function check_variant()
     return 1
 }
 
+function mka() {
+   m -j "$@"
+}
+
 function setpaths()
 {
     local T=$(gettop)
